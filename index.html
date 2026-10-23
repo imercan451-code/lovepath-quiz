@@ -3,111 +3,419 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Beziehungs-Check · LovePath by Maria</title>
-<meta name="description" content="Was steht zwischen euch? 4 kurze Fragen, 1 Minute – mit Auswertung und einem ersten Schritt für euch als Paar.">
+<title>LovePath by Maria · Kostenloses Beziehungs-Quiz</title>
+<meta name="description" content="Online-Beziehungscoaching für Paare und Singles. Mach das kostenlose Beziehungs-Quiz und finde heraus, welches Muster bei euch gerade festhängt.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Karla:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --pflaume: #4A2C3D;
-    --rose: #D8A7A0;
-    --sand: #F3EBE3;
-    --salbei: #8FA398;
-    --anthrazit: #2E2A2B;
-    --weiss: #FFFFFF;
+    --plum-900: #462D3C;
+    --plum-950: #2A1B24;
+    --cream: #EEE9E3;
+    --white-warm: #FAF7F3;
+    --terracotta: #B4735C;
+    --taupe: #C9BEB8;
+    --text-muted: #6E5A65;
     --head: 'Fraunces', Georgia, serif;
-    --body: 'Karla', 'Helvetica Neue', Arial, sans-serif;
+    --body: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    --wrap: 1120px;
   }
   * { box-sizing: border-box; }
-  html, body { margin: 0; }
+  html { scroll-behavior: smooth; }
   body {
-    background: #FBF7F3;
-    color: var(--anthrazit);
-    font-family: var(--body);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 24px 16px 40px;
+    margin: 0; background: var(--cream); color: var(--plum-900);
+    font-family: var(--body); font-size: 17px; line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
   }
-  header { width: 100%; max-width: 640px; display: flex; justify-content: center; margin-bottom: 20px; }
-  header img { width: 240px; max-width: 70%; height: auto; }
-  main { width: 100%; max-width: 640px; }
+  img { max-width: 100%; display: block; }
+  .wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 24px; }
+  @media (max-width: 600px) { .wrap { padding: 0 16px; } }
 
-  .quiz {
-    background: var(--sand);
-    padding: 40px 32px;
-    border-radius: 20px;
+  /* Hinweis-Leiste */
+  .demo-bar {
+    background: var(--plum-950); color: var(--cream); font-size: 13px; text-align: center;
+    padding: 7px 16px; opacity: .92;
   }
-  @media (max-width: 480px) { .quiz { padding: 28px 20px; } }
 
-  .eyebrow { margin: 0 0 10px; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; color: var(--salbei); font-weight: 700; }
-  h2 { font-family: var(--head); font-size: 34px; line-height: 1.15; margin: 0 0 14px; color: var(--pflaume); font-weight: 600; }
-  h3 { font-family: var(--head); font-size: 25px; line-height: 1.25; margin: 18px 0 20px; color: var(--pflaume); font-weight: 500; }
-  @media (max-width: 480px) { h2 { font-size: 28px; } h3 { font-size: 22px; } }
-  p { font-size: 17px; line-height: 1.55; margin: 0 0 22px; }
-  .small { font-size: 14px; opacity: .7; }
-
-  .progress-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-  .bar { height: 6px; background: rgba(74,44,61,.12); border-radius: 99px; overflow: hidden; }
-  .bar-fill { height: 100%; background: var(--rose); border-radius: 99px; transition: width .3s ease; }
-
-  .answers { display: flex; flex-direction: column; gap: 12px; }
-  .answer {
-    text-align: left; font-family: var(--body); font-size: 16px; line-height: 1.4;
-    padding: 16px 18px; border-radius: 12px;
-    border: 1.5px solid rgba(74,44,61,.18); background: rgba(255,255,255,.6);
-    color: var(--anthrazit); cursor: pointer; transition: all .15s ease;
+  /* Header */
+  header.nav {
+    position: sticky; top: 0; z-index: 20; background: rgba(238,233,227,.94);
+    backdrop-filter: blur(8px); border-bottom: 1px solid rgba(70,45,60,.1);
   }
-  .answer:hover, .answer.active { border-color: var(--pflaume); background: var(--weiss); }
+  .nav .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 68px; }
+  .nav img { height: 42px; width: auto; }
+  .nav-right { display: flex; align-items: center; gap: 20px; }
+  .nav-hint { font-size: 14px; color: var(--text-muted); }
+  @media (max-width: 760px) { .nav-hint { display: none; } .nav img { height: 36px; } }
 
+  /* Buttons */
   .btn {
-    display: inline-block; font-family: var(--body); font-size: 16px; font-weight: 700;
-    padding: 15px 26px; border-radius: 999px; border: none;
-    background: var(--pflaume); color: var(--weiss); cursor: pointer; text-decoration: none;
+    display: inline-block; font-family: var(--body); font-size: 16px; font-weight: 600;
+    padding: 15px 26px; border-radius: 9px; border: 1.5px solid var(--plum-950);
+    background: var(--plum-950); color: var(--cream); cursor: pointer; text-decoration: none;
+    transition: opacity .15s ease, transform .15s ease; text-align: center;
   }
   .btn:hover { opacity: .9; }
-  .btn:disabled { opacity: .6; cursor: default; }
-  .link {
+  .btn:active { transform: translateY(1px); }
+  .btn.small { padding: 10px 18px; font-size: 14px; }
+  .btn.light { background: var(--cream); color: var(--plum-950); border-color: var(--cream); }
+  .btn.ghost { background: transparent; color: var(--plum-900); border-color: var(--plum-900); }
+  .micro { font-size: 14px; color: var(--text-muted); margin: 12px 0 0; }
+
+  /* Typo */
+  section { padding: 96px 0; }
+  @media (max-width: 760px) { section { padding: 64px 0; } }
+  .eyebrow {
+    font-size: 12.5px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--terracotta); font-weight: 600; margin: 0 0 16px;
+  }
+  h1, h2, h3 { font-family: var(--head); color: var(--plum-900); margin: 0; font-weight: 600; }
+  h1 { font-size: clamp(36px, 5.2vw, 60px); line-height: 1.06; letter-spacing: -.01em; }
+  h2 { font-size: clamp(30px, 4vw, 44px); line-height: 1.12; letter-spacing: -.01em; max-width: 20ch; }
+  h3 { font-size: 21px; line-height: 1.3; }
+  .lead { font-size: 19px; color: var(--plum-900); max-width: 58ch; margin: 20px 0 0; }
+  .accent { font-family: var(--head); font-style: italic; color: var(--terracotta); font-weight: 500; }
+  p { margin: 0 0 16px; }
+
+  /* Hero */
+  .hero { padding: 72px 0 80px; }
+  .hero-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 56px; align-items: center; }
+  .hero .cta-row { margin-top: 32px; }
+  .hero-img {
+    border-radius: 18px; overflow: hidden; background: #E3DCD4; aspect-ratio: 4 / 5;
+  }
+  .hero-img img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+  .trust {
+    display: flex; flex-wrap: wrap; gap: 10px 28px; margin-top: 48px; padding-top: 24px;
+    border-top: 1px solid var(--taupe); font-size: 14px; color: var(--text-muted);
+  }
+  .trust span::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--terracotta); margin-right: 10px; vertical-align: middle; }
+  @media (max-width: 860px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 36px; }
+    .hero-img { max-width: 420px; aspect-ratio: 1 / 1; }
+  }
+
+  /* Karten-Grid */
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 48px; }
+  @media (max-width: 960px) { .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) { .grid-4 { grid-template-columns: 1fr; } }
+  .card {
+    border: 1px solid rgba(70,45,60,.18); border-radius: 14px; padding: 26px 24px; background: transparent;
+  }
+  .card .num { font-family: var(--head); font-size: 15px; color: var(--terracotta); margin-bottom: 14px; display: block; }
+  .card h3 { font-size: 19px; margin-bottom: 10px; }
+  .card p { font-size: 15.5px; color: var(--text-muted); margin: 0; }
+  .alt { background: var(--white-warm); }
+
+  /* Lösung */
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; margin-top: 44px; }
+  @media (max-width: 860px) { .split { grid-template-columns: 1fr; gap: 32px; } }
+  .points > div { padding: 0 0 20px; margin: 0 0 20px; border-bottom: 1px solid var(--taupe); }
+  .points > div:last-child { border-bottom: none; margin-bottom: 0; }
+  .points strong { display: block; font-weight: 600; margin-bottom: 4px; }
+  .points p { margin: 0; color: var(--text-muted); font-size: 16px; }
+  .timeline {
+    margin-top: 56px; background: var(--white-warm); border-radius: 16px; padding: 32px;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px;
+  }
+  .alt .timeline { background: var(--cream); }
+  .timeline h3 { font-size: 17px; margin-bottom: 8px; color: var(--terracotta); font-style: italic; font-weight: 500; }
+  .timeline p { font-size: 15.5px; margin: 0; color: var(--text-muted); }
+  .timeline-title { grid-column: 1 / -1; font-family: var(--head); font-size: 22px; margin: 0; }
+  @media (max-width: 860px) { .timeline { grid-template-columns: 1fr; padding: 24px; } }
+  .center-cta { margin-top: 48px; }
+
+  /* Proof */
+  .quotes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 44px; }
+  @media (max-width: 860px) { .quotes { grid-template-columns: 1fr; } }
+  .quote { border: 1px solid rgba(70,45,60,.18); border-radius: 14px; padding: 28px 26px; display: flex; flex-direction: column; }
+  .quote .mark { font-family: var(--head); font-size: 54px; line-height: .6; color: var(--terracotta); height: 26px; }
+  .quote blockquote { margin: 12px 0 24px; font-size: 17px; flex: 1; }
+  .quote .who { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+  .quote .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--taupe); flex-shrink: 0; }
+  .quote .who span { display: block; color: var(--text-muted); font-size: 13px; }
+  .sample-note { font-size: 13px; color: var(--text-muted); margin-top: 16px; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 56px; padding-top: 40px; border-top: 1px solid var(--taupe); }
+  .stats b { display: block; font-family: var(--head); font-size: 48px; font-weight: 600; line-height: 1; margin-bottom: 10px; }
+  .stats span { font-size: 15px; color: var(--text-muted); }
+  @media (max-width: 640px) { .stats { grid-template-columns: 1fr; } }
+
+  /* Quiz-Vorteile */
+  .eval-box {
+    margin-top: 36px; border-left: 3px solid var(--terracotta); background: var(--cream);
+    padding: 22px 26px; border-radius: 0 12px 12px 0; max-width: 760px;
+  }
+
+  /* Über Maria */
+  .about-grid { display: grid; grid-template-columns: .8fr 1.2fr; gap: 64px; align-items: start; }
+  .about-img { border-radius: 18px; overflow: hidden; background: #E3DCD4; aspect-ratio: 4 / 5; }
+  .about-img img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+  .about-name { font-size: 15px; color: var(--text-muted); margin: 14px 0 26px; }
+  .pull {
+    margin: 30px 0 0; font-family: var(--head); font-style: italic; font-size: 23px; line-height: 1.35;
+    color: var(--terracotta); padding-left: 22px; border-left: 2px solid var(--terracotta);
+  }
+  @media (max-width: 860px) { .about-grid { grid-template-columns: 1fr; gap: 32px; } .about-img { max-width: 380px; } }
+
+  /* Finale CTA */
+  .final { background: var(--plum-950); color: var(--cream); }
+  .final h2 { color: var(--cream); max-width: 22ch; }
+  .final .lead { color: rgba(238,233,227,.85); }
+  .final .micro { color: rgba(238,233,227,.65); }
+  .final-trust { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 56px; padding-top: 32px; border-top: 1px solid rgba(238,233,227,.18); font-size: 15.5px; color: rgba(238,233,227,.8); }
+  @media (max-width: 760px) { .final-trust { grid-template-columns: 1fr; } }
+
+  footer.site { background: var(--plum-950); color: rgba(238,233,227,.6); font-size: 14px; padding: 28px 0 36px; border-top: 1px solid rgba(238,233,227,.1); }
+  footer.site .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
+  footer.site a { color: inherit; }
+
+  /* ===== Quiz-Fenster ===== */
+  .modal {
+    position: fixed; inset: 0; z-index: 100; display: none; align-items: center; justify-content: center;
+    background: rgba(42,27,36,.55); padding: 16px; overflow-y: auto;
+  }
+  .modal.open { display: flex; }
+  .modal-box {
+    position: relative; width: 100%; max-width: 620px; max-height: calc(100vh - 32px); overflow-y: auto;
+    background: var(--white-warm); border-radius: 18px; padding: 44px 36px 32px;
+    box-shadow: 0 24px 60px rgba(42,27,36,.3);
+  }
+  @media (max-width: 520px) { .modal-box { padding: 40px 20px 24px; } }
+  .modal-close {
+    position: absolute; top: 12px; right: 12px; width: 38px; height: 38px; border-radius: 50%;
+    border: none; background: transparent; font-size: 24px; line-height: 1; color: var(--plum-900); cursor: pointer;
+  }
+  .modal-close:hover { background: var(--cream); }
+  body.no-scroll { overflow: hidden; }
+
+  .q-h2 { font-family: var(--head); font-size: 32px; line-height: 1.15; margin: 0 0 14px; font-weight: 600; }
+  .q-h3 { font-family: var(--head); font-size: 24px; line-height: 1.25; margin: 18px 0 20px; font-weight: 500; }
+  @media (max-width: 520px) { .q-h2 { font-size: 27px; } .q-h3 { font-size: 21px; } }
+  .q-p { font-size: 17px; line-height: 1.55; margin: 0 0 22px; }
+  .q-small { font-size: 14px; color: var(--text-muted); }
+  .q-progress { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .q-bar { height: 6px; background: rgba(70,45,60,.12); border-radius: 99px; overflow: hidden; }
+  .q-bar-fill { height: 100%; background: var(--terracotta); border-radius: 99px; transition: width .3s ease; }
+  .q-answers { display: flex; flex-direction: column; gap: 12px; }
+  .q-answer {
+    text-align: left; font-family: var(--body); font-size: 16px; line-height: 1.45;
+    padding: 16px 18px; border-radius: 12px; border: 1.5px solid rgba(70,45,60,.18);
+    background: var(--cream); color: var(--plum-900); cursor: pointer; transition: all .15s ease;
+  }
+  .q-answer:hover, .q-answer.active { border-color: var(--plum-900); background: #fff; }
+  .q-link {
     background: none; border: none; padding: 0; font-family: var(--body); font-size: 14px;
-    color: var(--pflaume); cursor: pointer; text-decoration: underline;
+    color: var(--plum-900); cursor: pointer; text-decoration: underline;
   }
-
-  label.field { display: block; font-size: 14px; font-weight: 700; margin-bottom: 14px; }
-  label.field input {
-    display: block; width: 100%; margin-top: 6px; padding: 13px 14px; font-size: 16px;
-    font-family: var(--body); border-radius: 10px; border: 1.5px solid rgba(74,44,61,.2);
-    background: var(--weiss); color: var(--anthrazit); outline: none;
+  .q-field { display: block; font-size: 14px; font-weight: 600; margin-bottom: 14px; }
+  .q-field input {
+    display: block; width: 100%; margin-top: 6px; padding: 13px 14px; font-size: 16px; font-family: var(--body);
+    border-radius: 9px; border: 1.5px solid rgba(70,45,60,.2); background: #fff; color: var(--plum-900); outline: none;
   }
-  label.field input:focus { border-color: var(--pflaume); }
-  label.check { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.45; margin: 6px 0 18px; }
-  label.check input { margin-top: 3px; }
-  .error { color: #A23B3B; font-size: 14px; margin: 0 0 14px; }
-  .tip {
-    background: var(--weiss); border-left: 4px solid var(--salbei);
-    padding: 16px 18px; border-radius: 10px; font-size: 16px; line-height: 1.5; margin-bottom: 24px;
+  .q-field input:focus { border-color: var(--plum-900); }
+  .q-check { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.45; margin: 6px 0 18px; }
+  .q-check input { margin-top: 3px; }
+  .q-error { color: #A23B3B; font-size: 14px; margin: 0 0 14px; }
+  .q-tip {
+    background: var(--cream); border-left: 3px solid var(--terracotta);
+    padding: 16px 18px; border-radius: 0 10px 10px 0; font-size: 16px; line-height: 1.5; margin-bottom: 24px;
   }
-  .demo { margin-top: 28px; font-size: 12px; opacity: .55; }
-
-  footer { margin-top: 28px; font-size: 13px; opacity: .6; text-align: center; }
-  footer a { color: inherit; }
+  .q-demo { margin-top: 28px; font-size: 12px; color: var(--text-muted); }
 </style>
 </head>
 <body>
-  <header>
-    <img src="logo.svg" alt="LovePath by Maria">
-  </header>
 
-  <main>
-    <div class="quiz" id="quiz" aria-live="polite"></div>
-  </main>
+<div class="demo-bar">Fiktives Übungsprojekt: LovePath by Maria gibt es nicht wirklich. Keine echte Beratung.</div>
 
-  <footer>
-    © LovePath by Maria
-    <!-- Für eine echte Webseite in Deutschland: Links zu Impressum und Datenschutz hier ergänzen -->
-  </footer>
+<header class="nav">
+  <div class="wrap">
+    <a href="#top" aria-label="LovePath by Maria – nach oben"><img src="logo.svg" alt="LovePath by Maria"></a>
+    <div class="nav-right">
+      <span class="nav-hint">Kostenloses Beziehungs-Quiz, wenige Minuten</span>
+      <button class="btn small" data-quiz>Quiz starten</button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- 01 Hero -->
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">Online-Beziehungscoaching · ohne Wartezeit auf einen Therapieplatz</p>
+          <h1>Ihr organisiert euren Alltag perfekt. <span class="accent">Und redet über nichts anderes mehr.</span></h1>
+          <p class="lead">Wir helfen dir, aus dem Mitbewohner-Modus wieder ein Paar zu machen. Online, in deinem Tempo und auch dann, wenn dein Partner noch nicht mitziehen will.</p>
+          <div class="cta-row">
+            <button class="btn" data-quiz>Sichere dir jetzt dein kostenloses Beziehungs-Quiz</button>
+            <p class="micro">Wenige Minuten. Kostenlos. Dein Partner muss nicht mitmachen.</p>
+          </div>
+        </div>
+        <div class="hero-img">
+          <img src="maria.jpg" alt="Maria Bordfeld, Beziehungscoach" width="618" height="1100">
+        </div>
+      </div>
+      <div class="trust">
+        <span>Dreijährige systemische Beratungsausbildung</span>
+        <span>7 Jahre Ehe- und Familienberatung</span>
+        <span>Seit 2023 ausschließlich online</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 Problem -->
+  <section class="alt">
+    <div class="wrap">
+      <p class="eyebrow">Kommt dir das bekannt vor?</p>
+      <h2>Es ist nichts Dramatisches passiert. Genau das macht es so schwer.</h2>
+      <p class="lead">Kein Streit, der alles erklärt. Keine Krise, die du jemandem erzählen könntest. Nur das Gefühl, dass ihr euch langsam verliert, zwischen Kita, Schichtplan und Wäscheberg.</p>
+      <div class="grid-4">
+        <div class="card"><span class="num">01</span><h3>Ihr redet nur noch über Organisatorisches</h3><p>Einkauf, Termine, wer die Kinder abholt. Alles läuft. Nur über euch redet ihr nicht mehr.</p></div>
+        <div class="card"><span class="num">02</span><h3>Gespräche kippen, sobald es unangenehm wird</h3><p>Nach zehn Minuten geht es um Vorwürfe, oder einer steht auf. Am Sonntagabend besonders zuverlässig.</p></div>
+        <div class="card"><span class="num">03</span><h3>Du kennst euer Muster und kommst trotzdem nicht raus</h3><p>Du hast Bücher gelesen und Podcasts gehört. Im echten Gespräch passiert dann wieder genau dasselbe.</p></div>
+        <div class="card"><span class="num">04</span><h3>Dein Partner will keine Beratung</h3><p>Du willst trotzdem anfangen. Ohne dass jemand in deinem Umfeld davon erfährt.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 Lösung -->
+  <section>
+    <div class="wrap">
+      <p class="eyebrow">Du kannst allein anfangen</p>
+      <h2>Stell dir vor, der Sonntagabend <span class="accent">fühlt sich wieder leicht an.</span></h2>
+      <div class="split">
+        <div>
+          <p>Ihr sitzt am Küchentisch und redet nicht über den Kita-Plan. Du sagst, was dich beschäftigt, und dein Partner bleibt sitzen. Das Gespräch kippt nicht. Ihr seid wieder ein Team und nicht zwei Abteilungen, die sich per Nachricht abstimmen.</p>
+          <p>Es fühlt sich nicht mehr wie ein Kraftakt an, sondern wie euer Alltag. Dahin kommst du nicht über eine Diagnose, sondern darüber, dass du euer eigenes Muster endlich verstehst. Und das kannst du allein anfangen.</p>
+        </div>
+        <div class="points">
+          <div><strong>Du fängst an zu reden, ohne Angst vor dem Ausgang</strong><p>Die Themen, die du monatelang aufgeschoben hast, bringst du auf den Tisch. Und es bleibt ruhig.</p></div>
+          <div><strong>Du erkennst euer Muster, bevor es zuschlägt</strong><p>Mitten im Gespräch merkst du, was gerade passiert, und kannst aussteigen statt mitzufahren.</p></div>
+          <div><strong>Du bist nicht mehr die Einzige, die sich kümmert</strong><p>Oft zieht der Partner nach, wenn sich auf einer Seite etwas verändert. Ohne dass du ihn überreden musst.</p></div>
+          <div><strong>Und niemand muss davon wissen</strong><p>Alles online, in deinem Tempo. Kein Wartezimmer, kein Gespräch mit der Familie darüber.</p></div>
+        </div>
+      </div>
+      <div class="timeline">
+        <p class="timeline-title">Wie sich das bei dir anfühlt</p>
+        <div><h3>Nach dem Quiz</h3><p>Du hast endlich einen Namen für das, was bei euch schiefläuft. Es liegt nicht an dir und nicht an ihm, sondern an einem Muster, das ihr beide kennt.</p></div>
+        <div><h3>Nach 4 Wochen</h3><p>Das erste Gespräch, das nicht kippt. Ihr redet zwanzig Minuten über etwas Unangenehmes und keiner steht auf.</p></div>
+        <div><h3>Nach 3 Monaten</h3><p>Ihr seid wieder ein Team. Nicht streitfrei, aber auf derselben Seite. Und wenn es doch knallt, findet ihr allein wieder zueinander.</p></div>
+      </div>
+      <div class="center-cta">
+        <button class="btn" data-quiz>Finde heraus, wo ihr gerade steht</button>
+        <p class="micro">Kostenloses Quiz, wenige Minuten. Der erste Schritt dahin.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 Proof -->
+  <section class="alt">
+    <div class="wrap">
+      <p class="eyebrow">Stimmen</p>
+      <h2>Andere haben genau da angefangen, wo du gerade stehst.</h2>
+      <div class="quotes">
+        <figure class="quote" style="margin:0">
+          <div class="mark">„</div>
+          <blockquote>Der Kurs „Partnerschaft verstehen“ hat unsere Beziehung gerettet.</blockquote>
+          <figcaption class="who"><div class="avatar"></div><div><strong>Anna Weber</strong><span>Selbstlernkurs Partnerschaft</span></div></figcaption>
+        </figure>
+        <figure class="quote" style="margin:0">
+          <div class="mark">„</div>
+          <blockquote>Ich habe allein angefangen, weil mein Mann nicht wollte. Nach sechs Wochen hat er sich dann doch dazugesetzt.</blockquote>
+          <figcaption class="who"><div class="avatar"></div><div><strong>Kathrin M.</strong><span>Standortbestimmung, allein gestartet</span></div></figcaption>
+        </figure>
+        <figure class="quote" style="margin:0">
+          <div class="mark">„</div>
+          <blockquote>Ich bin Single und dachte erst, das Ganze ist nichts für mich. War es aber.</blockquote>
+          <figcaption class="who"><div class="avatar"></div><div><strong>Ellen R.</strong><span>Kurs Kommunikation</span></div></figcaption>
+        </figure>
+      </div>
+      <p class="sample-note">Beispiel-Stimmen aus dem fiktiven Übungscase, keine echten Kundenbewertungen.</p>
+      <div class="stats">
+        <div><b>2021</b><span>seit diesem Jahr online, seit 2023 ausschließlich</span></div>
+        <div><b>7</b><span>Jahre in der Ehe- und Familienberatung, Schwerpunkt Paargespräche</span></div>
+        <div><b>12</b><span>Live-Sessions im Paar-Coaching-Programm</span></div>
+      </div>
+      <div class="center-cta">
+        <button class="btn" data-quiz>Quiz jetzt kostenlos starten</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 Das Quiz -->
+  <section>
+    <div class="wrap">
+      <p class="eyebrow">Das Quiz</p>
+      <h2>Was du nach dem Quiz über deine Beziehung weißt.</h2>
+      <p class="lead">Wenige Minuten, ein paar ehrliche Fragen. Danach hast du schwarz auf weiß, was bei euch gerade wirklich passiert.</p>
+      <div class="grid-4">
+        <div class="card"><span class="num">01</span><h3>Welches Muster bei euch läuft</h3><p>Ob ihr Unangenehmes runterschluckt, aneinander vorbeiredet oder im Alltag versinkt. Du erkennst euch in der Beschreibung wieder.</p></div>
+        <div class="card"><span class="num">02</span><h3>Warum euer Gespräch hängt</h3><p>Nicht das Thema ist das Problem, sondern wie ihr miteinander umgeht. Du siehst, wo es bei euch klemmt.</p></div>
+        <div class="card"><span class="num">03</span><h3>Was du als Erstes ändern kannst</h3><p>Ein konkreter Schritt für die nächste Woche. Nichts, wofür dein Partner mitmachen muss.</p></div>
+        <div class="card"><span class="num">04</span><h3>Dass du damit nicht allein bist</h3><p>Diese Muster kennen viele Paare. Du bekommst eine Einordnung, statt weiter zu rätseln.</p></div>
+      </div>
+      <div class="eval-box">
+        Deine Auswertung siehst du direkt nach der letzten Frage. Kostenlos, ohne Zahlungsdaten. Niemand ruft dich an.
+      </div>
+      <div class="center-cta">
+        <button class="btn" data-quiz>Jetzt Quiz starten und Auswertung erhalten</button>
+        <p class="micro">Vier Fragen, etwa eine Minute. Du kannst jederzeit abbrechen.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 Über Maria -->
+  <section class="alt">
+    <div class="wrap">
+      <div class="about-grid">
+        <div class="about-img"><img src="maria.jpg" alt="Porträt von Maria Bordfeld" loading="lazy" width="618" height="1100"></div>
+        <div>
+          <p class="eyebrow">Über mich</p>
+          <h2>Hallo, ich bin Maria.</h2>
+          <p class="about-name">Maria Bordfeld, Gründerin und Beziehungscoach</p>
+          <p>Ich habe Sozialpädagogik studiert und danach sieben Jahre in einer kirchlichen Familien- und Eheberatungsstelle gearbeitet, Schwerpunkt Paargespräche. Dazu kommt eine dreijährige systemische Beratungsausbildung.</p>
+          <p>Seit 2021 begleite ich Paare online, seit 2023 ausschließlich. In den Gesprächen habe ich gelernt: Die wenigsten brauchen eine Diagnose. Sie brauchen jemanden, der mit ihnen anschaut, was zwischen ihnen im Alltag wirklich passiert.</p>
+          <p>Deshalb arbeite ich nicht mit Schuldfragen und nicht mit Etiketten, sondern mit deinen konkreten Situationen. Und deshalb kannst du bei mir auch allein anfangen.</p>
+          <p class="pull">Kein Wartezimmer, keine Diagnose, kein Schuldgespräch. Nur der Blick auf das, was zwischen euch passiert.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 Finale CTA -->
+  <section class="final">
+    <div class="wrap">
+      <h2>Fang heute an zu verstehen, woran es bei euch hängt. <span class="accent">Auch wenn du allein anfängst.</span></h2>
+      <p class="lead">Das Beziehungs-Quiz dauert nur wenige Minuten. Du bekommst deine persönliche Auswertung und einen ersten Schritt, den du direkt ausprobieren kannst.</p>
+      <div class="center-cta" style="margin-top:32px">
+        <button class="btn light" data-quiz>Sichere dir jetzt dein kostenloses Beziehungs-Quiz</button>
+        <p class="micro">Kein Abo, keine Zahlungsdaten, keine Verpflichtung.</p>
+      </div>
+      <div class="final-trust">
+        <p>Das Quiz und die Auswertung sind kostenlos. Du musst danach nichts kaufen.</p>
+        <p>Diskret: kein Praxisbesuch, keine Unterlagen im Briefkasten, niemand in deinem Umfeld erfährt davon.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <span>© LovePath by Maria · fiktives Übungsprojekt</span>
+    <!-- Für eine echte Webseite in Deutschland: Impressum · Datenschutz · Kontakt verlinken -->
+  </div>
+</footer>
+
+<!-- Quiz-Fenster -->
+<div class="modal" id="quiz-modal" role="dialog" aria-modal="true" aria-label="Beziehungs-Quiz">
+  <div class="modal-box">
+    <button class="modal-close" id="quiz-close" aria-label="Quiz schließen">×</button>
+    <div id="quiz" aria-live="polite"></div>
+  </div>
+</div>
 
 <script>
   // ===== Einstellungen =====
@@ -174,74 +482,99 @@
 
   var total = QUESTIONS.length;
   var withForm = !!WEBHOOK_URL;
-  var state = { step: -1, answers: [], name: "", email: "", consent: false, error: "", sending: false };
+  function freshState() {
+    return { step: 0, answers: [], name: "", email: "", consent: false, error: "", sending: false };
+  }
+  var state = freshState();
   var root = document.getElementById("quiz");
+  var modal = document.getElementById("quiz-modal");
+  var box = modal.querySelector(".modal-box");
+  var lastFocus = null;
 
   function render() {
     var s = state, html = "";
 
-    if (s.step === -1) {
-      html =
-        '<p class="eyebrow">Beziehungs-Check · 4 Fragen · 1 Minute</p>' +
-        '<h2>Was steht zwischen euch?</h2>' +
-        '<p>Beantworte vier kurze Fragen. Am Ende bekommst du deine Auswertung und einen ersten Schritt, den ihr direkt ausprobieren könnt.</p>' +
-        '<button class="btn" data-action="start">Quiz starten</button>';
-    } else if (s.step < total) {
+    if (s.step < total) {
       var q = QUESTIONS[s.step];
       html =
-        '<div class="progress-row"><span class="small">Frage ' + (s.step + 1) + ' von ' + total + '</span>' +
-        (s.step > 0 ? '<button class="link" data-action="back">← Zurück</button>' : '') + '</div>' +
-        '<div class="bar"><div class="bar-fill" style="width:' + ((s.step + 1) / total * 100) + '%"></div></div>' +
-        '<h3>' + esc(q.q) + '</h3><div class="answers">' +
+        (s.step === 0 ? '<p class="eyebrow">Beziehungs-Check · 4 Fragen · 1 Minute</p>' : '') +
+        '<div class="q-progress"><span class="q-small">Frage ' + (s.step + 1) + ' von ' + total + '</span>' +
+        (s.step > 0 ? '<button class="q-link" data-action="back">← Zurück</button>' : '') + '</div>' +
+        '<div class="q-bar"><div class="q-bar-fill" style="width:' + ((s.step + 1) / total * 100) + '%"></div></div>' +
+        '<h3 class="q-h3">' + esc(q.q) + '</h3><div class="q-answers">' +
         q.answers.map(function (a) {
-          return '<button class="answer' + (s.answers[s.step] === a.key ? ' active' : '') +
+          return '<button class="q-answer' + (s.answers[s.step] === a.key ? ' active' : '') +
             '" data-action="choose" data-key="' + a.key + '">' + esc(a.text) + '</button>';
         }).join("") + '</div>';
     } else if (s.step === total) {
       html =
         '<form novalidate>' +
         '<p class="eyebrow">Fast geschafft</p>' +
-        '<h3>Wohin dürfen wir deine Auswertung schicken?</h3>' +
-        '<p>Du siehst dein Ergebnis gleich hier und bekommst es zusätzlich per E-Mail.</p>' +
-        '<label class="field">Vorname<input name="name" value="' + esc(s.name) + '" placeholder="z. B. Lena" autocomplete="given-name"></label>' +
-        '<label class="field">E-Mail<input name="email" type="email" value="' + esc(s.email) + '" placeholder="du@beispiel.de" autocomplete="email"></label>' +
-        '<label class="check"><input name="consent" type="checkbox"' + (s.consent ? ' checked' : '') + '>' +
+        '<h3 class="q-h3">Wohin dürfen wir deine Auswertung schicken?</h3>' +
+        '<p class="q-p">Du siehst dein Ergebnis gleich hier und bekommst es zusätzlich per E-Mail.</p>' +
+        '<label class="q-field">Vorname<input name="name" value="' + esc(s.name) + '" placeholder="z. B. Lena" autocomplete="given-name"></label>' +
+        '<label class="q-field">E-Mail<input name="email" type="email" value="' + esc(s.email) + '" placeholder="du@beispiel.de" autocomplete="email"></label>' +
+        '<label class="q-check"><input name="consent" type="checkbox"' + (s.consent ? ' checked' : '') + '>' +
         '<span>Ich bin einverstanden, dass meine Angaben gespeichert werden, um mir die Auswertung zu schicken. Abmelden geht jederzeit.</span></label>' +
-        (s.error ? '<p class="error">' + esc(s.error) + '</p>' : '') +
+        (s.error ? '<p class="q-error">' + esc(s.error) + '</p>' : '') +
         '<button class="btn" type="submit"' + (s.sending ? ' disabled' : '') + '>' + (s.sending ? 'Wird gesendet …' : 'Ergebnis anzeigen') + '</button>' +
-        '<div style="margin-top:12px"><button type="button" class="link" data-action="back">← Zurück zur letzten Frage</button></div>' +
+        '<div style="margin-top:12px"><button type="button" class="q-link" data-action="back">← Zurück zur letzten Frage</button></div>' +
         '</form>';
     } else {
       var r = RESULTS[pickResult(s.answers)];
       html =
         '<p class="eyebrow">Dein Ergebnis' + (s.name.trim() ? ', ' + esc(s.name.trim()) : '') + '</p>' +
-        '<h2>' + esc(r.title) + '</h2>' +
-        '<p>' + esc(r.text) + '</p>' +
-        '<div class="tip">' + esc(r.tip) + '</div>' +
+        '<h2 class="q-h2">' + esc(r.title) + '</h2>' +
+        '<p class="q-p">' + esc(r.text) + '</p>' +
+        '<div class="q-tip">' + esc(r.tip) + '</div>' +
         (CTA_LINK ? '<a class="btn" href="' + esc(CTA_LINK) + '">' + esc(CTA_TEXT) + '</a>' : '') +
-        '<div style="margin-top:16px"><button class="link" data-action="restart">Quiz neu starten</button></div>';
+        '<div style="margin-top:16px;display:flex;gap:20px;flex-wrap:wrap">' +
+        '<button class="q-link" data-action="restart">Quiz neu starten</button>' +
+        '<button class="q-link" data-action="close">Zurück zur Seite</button></div>';
     }
 
-    if (DEMO_HINT) html += '<p class="demo">' + esc(DEMO_HINT) + '</p>';
+    if (DEMO_HINT) html += '<p class="q-demo">' + esc(DEMO_HINT) + '</p>';
     root.innerHTML = html;
+    box.scrollTop = 0;
   }
+
+  function openQuiz() {
+    lastFocus = document.activeElement;
+    state = freshState();
+    render();
+    modal.classList.add("open");
+    document.body.classList.add("no-scroll");
+    var first = root.querySelector("button");
+    if (first) first.focus();
+  }
+  function closeQuiz() {
+    modal.classList.remove("open");
+    document.body.classList.remove("no-scroll");
+    if (lastFocus) lastFocus.focus();
+  }
+
+  document.querySelectorAll("[data-quiz]").forEach(function (b) {
+    b.addEventListener("click", openQuiz);
+  });
+  document.getElementById("quiz-close").addEventListener("click", closeQuiz);
+  modal.addEventListener("click", function (e) { if (e.target === modal) closeQuiz(); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && modal.classList.contains("open")) closeQuiz();
+  });
 
   root.addEventListener("click", function (e) {
     var el = e.target.closest("[data-action]");
     if (!el) return;
     var a = el.getAttribute("data-action");
-    if (a === "start") state.step = 0;
-    else if (a === "back") state.step -= 1;
+    if (a === "back") state.step -= 1;
     else if (a === "choose") {
       state.answers = state.answers.slice(0, state.step).concat(el.getAttribute("data-key"));
       state.step += 1;
       // Ohne Webhook: Formular überspringen, Ergebnis direkt zeigen
       if (state.step === total && !withForm) state.step = total + 1;
-    } else if (a === "restart") {
-      state = { step: -1, answers: [], name: "", email: "", consent: false, error: "", sending: false };
-    }
+    } else if (a === "restart") state = freshState();
+    else if (a === "close") return closeQuiz();
     render();
-    window.scrollTo({ top: 0, behavior: "smooth" });
   });
 
   root.addEventListener("input", function (e) {
@@ -283,8 +616,6 @@
         render();
       });
   });
-
-  render();
 </script>
 </body>
 </html>
