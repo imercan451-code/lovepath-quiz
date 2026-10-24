@@ -16,6 +16,25 @@ function makeDoiToken(email, secret) {
   return payload + '.' + sig;
 }
 
+// Quiz-Ergebnis aus den Antworten (Frage 1–5). Die Regeln werden der Reihe nach geprüft, die erste passende gilt.
+// Der Wert landet im Brevo-Feld QUIZ_ERGEBNIS; die Ergebnis-Automationen in Brevo filtern genau auf diese Texte.
+const ERGEBNIS = {
+  A: 'A: Partnerschaft verstehen',
+  B: 'B: Beziehungsstandort-Bestimmung',
+  C: 'C: Paar-Coaching-Programm',
+  D: 'D: Kommunikation in Beziehungen'
+};
+
+function quizErgebnis(antworten) {
+  const a = (i) => String((antworten[i] && antworten[i].antwort) || '');
+  const gespraeche = a(0), zeit = a(2), partner = a(3), wunsch = a(4);
+  if (partner.startsWith('Eher nicht')) return ERGEBNIS.A;
+  if (partner.startsWith('Weiß ich noch nicht') || wunsch.startsWith('Klarheit')) return ERGEBNIS.B;
+  const ernst = gespraeche.includes('Streit') || gespraeche.includes('kaum') || zeit === 'Fast nie';
+  if (partner.startsWith('Ja') && ernst) return ERGEBNIS.C;
+  return ERGEBNIS.D;
+}
+
 async function sendToBrevo(apiKey, body) {
   const res = await fetch(BREVO_URL, {
     method: 'POST',
@@ -56,14 +75,18 @@ module.exports = async (req, res) => {
     : '';
 
   const base = { email, listIds: [listId], updateEnabled: true };
-  const minimal = { FIRSTNAME: vorname, DOI_TOKEN: makeDoiToken(email, apiKey) };
+  const minimal = {
+    FIRSTNAME: vorname,
+    DOI_TOKEN: makeDoiToken(email, apiKey),
+    QUIZ_ERGEBNIS: quizErgebnis(Array.isArray(data.antworten) ? data.antworten : [])
+  };
   const extras = {
     TELEFON: String(data.telefon || '').trim().slice(0, 50),
     QUIZ_ANTWORTEN: antworten
   };
 
   // Erst mit allen Feldern versuchen. Lehnt Brevo ein Zusatzfeld ab, wird mit weniger Feldern
-  // erneut gespeichert, damit die Anmeldung nicht verloren geht. Vorname und DOI_TOKEN sind immer dabei.
+  // erneut gespeichert, damit die Anmeldung nicht verloren geht. Vorname, DOI_TOKEN und QUIZ_ERGEBNIS sind immer dabei.
   const attempts = [
     { ...minimal, ...extras, 'DOUBLE_OPT-IN': DOI_NO },
     { ...minimal, ...extras },
