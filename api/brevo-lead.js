@@ -1,8 +1,20 @@
 // Vercel-Funktion: nimmt die Quiz-Anmeldung entgegen und legt die Person als Kontakt in Brevo an.
-// Benötigte Umgebungsvariablen in Vercel: BREVO_API_KEY und BREVO_LIST_ID.
+// Die Person landet zuerst in der Single-Opt-in-Liste (unbestätigt). Erst nach Klick auf den
+// Bestätigungslink (siehe api/confirm.js) wird sie in die Double-Opt-in-Liste verschoben.
+// Benötigte Umgebungsvariablen in Vercel: BREVO_API_KEY und BREVO_SOI_LIST_ID (Single-Opt-in-Liste).
+
+const crypto = require('crypto');
 
 const BREVO_URL = 'https://api.brevo.com/v3/contacts';
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const DOI_NO = 2; // Brevo-Standardfeld DOUBLE_OPT-IN: 1 = Ja, 2 = Nein
+
+// Bestätigungscode: E-Mail-Adresse plus Signatur, damit niemand fremde Adressen bestätigen kann.
+function makeDoiToken(email, secret) {
+  const payload = Buffer.from(email.toLowerCase()).toString('base64url');
+  const sig = crypto.createHmac('sha256', secret).update('doi:' + email.toLowerCase()).digest('base64url').slice(0, 32);
+  return payload + '.' + sig;
+}
 
 async function sendToBrevo(apiKey, body) {
   const res = await fetch(BREVO_URL, {
@@ -21,9 +33,9 @@ module.exports = async (req, res) => {
   }
 
   const apiKey = process.env.BREVO_API_KEY;
-  const listId = Number(process.env.BREVO_LIST_ID);
+  const listId = Number(process.env.BREVO_SOI_LIST_ID);
   if (!apiKey || !listId) {
-    console.error('[brevo-lead] BREVO_API_KEY oder BREVO_LIST_ID fehlt in den Vercel-Umgebungsvariablen.');
+    console.error('[brevo-lead] BREVO_API_KEY oder BREVO_SOI_LIST_ID fehlt in den Vercel-Umgebungsvariablen.');
     return res.status(500).json({ error: 'Server ist nicht eingerichtet.' });
   }
 
@@ -44,21 +56,24 @@ module.exports = async (req, res) => {
     : '';
 
   const base = { email, listIds: [listId], updateEnabled: true };
-  const full = {
-    ...base,
-    attributes: {
-      FIRSTNAME: vorname,
-      TELEFON: String(data.telefon || '').trim().slice(0, 50),
-      QUIZ_ANTWORTEN: antworten
-    }
+  const minimal = { FIRSTNAME: vorname, DOI_TOKEN: makeDoiToken(email, apiKey) };
+  const extras = {
+    TELEFON: String(data.telefon || '').trim().slice(0, 50),
+    QUIZ_ANTWORTEN: antworten
   };
 
-  // Erst mit allen Feldern versuchen. Gibt es TELEFON oder QUIZ_ANTWORTEN in Brevo nicht,
-  // lehnt Brevo ab, dann wird der Kontakt nur mit dem Vornamen gespeichert.
-  let result = await sendToBrevo(apiKey, full);
-  if (!result.ok && result.status === 400) {
-    console.warn('[brevo-lead] Brevo lehnt Zusatzfelder ab, speichere nur Vornamen:', result.text);
-    result = await sendToBrevo(apiKey, { ...base, attributes: { FIRSTNAME: vorname } });
+  // Erst mit allen Feldern versuchen. Lehnt Brevo ein Zusatzfeld ab, wird mit weniger Feldern
+  // erneut gespeichert, damit die Anmeldung nicht verloren geht. Vorname und DOI_TOKEN sind immer dabei.
+  const attempts = [
+    { ...minimal, ...extras, 'DOUBLE_OPT-IN': DOI_NO },
+    { ...minimal, ...extras },
+    minimal
+  ];
+  let result;
+  for (const attributes of attempts) {
+    result = await sendToBrevo(apiKey, { ...base, attributes });
+    if (result.ok || result.status !== 400) break;
+    console.warn('[brevo-lead] Brevo lehnt Felder ab, versuche es mit weniger:', result.text);
   }
 
   if (!result.ok) {
@@ -67,3 +82,5 @@ module.exports = async (req, res) => {
   }
   return res.status(200).json({ ok: true });
 };
+
+module.exports.makeDoiToken = makeDoiToken;
