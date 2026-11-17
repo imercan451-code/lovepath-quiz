@@ -85,10 +85,20 @@ module.exports = async (req, res) => {
     QUIZ_ANTWORTEN: antworten
   };
 
+  // UTM-Parameter aus dem Link, über den die Person kam (z. B. aus einer Meta-Anzeige).
+  // Leere Werte werden weggelassen, damit ein späterer Besuch ohne UTM nichts überschreibt.
+  const utmIn = data.utm && typeof data.utm === 'object' ? data.utm : {};
+  const utm = {};
+  for (const k of ['source', 'medium', 'campaign', 'content', 'term']) {
+    const v = String(utmIn['utm_' + k] || '').trim().slice(0, 200);
+    if (v) utm['UTM_' + k.toUpperCase()] = v;
+  }
+
   // Erst mit allen Feldern versuchen. Lehnt Brevo ein Zusatzfeld ab, wird mit weniger Feldern
   // erneut gespeichert, damit die Anmeldung nicht verloren geht. Vorname, DOI_TOKEN und QUIZ_ERGEBNIS sind immer dabei.
   const attempts = [
-    { ...minimal, ...extras, 'DOUBLE_OPT-IN': DOI_NO },
+    { ...minimal, ...extras, ...utm, 'DOUBLE_OPT-IN': DOI_NO },
+    { ...minimal, ...extras, ...utm },
     { ...minimal, ...extras },
     minimal
   ];
